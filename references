@@ -1,0 +1,73 @@
+// references
+
+#include <iostream>
+#include <vector>
+#include <functional> //
+
+class CAnimal
+{
+protected:
+    int m_id;
+public:
+    int& id(){return m_id;}
+    virtual bool canEat(const CAnimal&) const = 0;
+};
+
+bool CAnimal::canEat(const CAnimal& other) const{return (&other!=this);}
+
+class CSheep: public CAnimal
+{
+public:
+    virtual bool canEat(const CAnimal&) const override{return false;}
+};
+
+class CWolf: public CAnimal
+{
+public:
+    virtual bool canEat(const CAnimal& other) const override{return[&]{try{dynamic_cast<const CSheep&>(other); return true;}catch(...){}; return false;}() && CAnimal::canEat(other);}
+};
+
+class CShelter
+{
+    std::vector<std::optional<std::reference_wrapper<CAnimal>>> m_animals;
+public:
+    void addAnimal(std::optional<std::reference_wrapper<CAnimal>> ani){if(std::nullopt!=ani){if(!m_animals.empty()) if(ani->get().canEat(m_animals.back()->get()) || m_animals.back()->get().canEat(ani->get())) return; m_animals.push_back(ani);}}
+    void clear(){m_animals.clear();}
+    const auto& getAnimals() const{return m_animals;}
+    int getAnimalCount(){return m_animals.size();}
+};
+
+int main()
+{
+    CSheep mySheep;
+    CSheep yourSheep;
+    CWolf aWolf;
+    
+    CShelter shelter;
+    
+    shelter.addAnimal(mySheep);
+    shelter.addAnimal(yourSheep);
+    shelter.addAnimal(aWolf);
+    std::cout<<shelter.getAnimalCount()<<" animal(s) in shelter\n";
+    
+    int i = 0;
+    for(const auto it: shelter.getAnimals()){it->get().id() = ++i;}
+    std::cout<<"my sheep id = "<<mySheep.id()<<std::endl;
+    std::cout<<"your sheep id = "<<yourSheep.id()<<std::endl;
+    std::cout<<"a wolf id = "<<aWolf.id()<<std::endl;
+    
+    shelter.clear();
+    shelter.addAnimal(aWolf);
+    shelter.addAnimal(yourSheep);
+    shelter.addAnimal(mySheep);
+    std::cout<<shelter.getAnimalCount()<<" animal(s) in shelter\n";
+
+    for(const auto it: shelter.getAnimals()){it->get().id() = ++i;}
+    std::cout<<"my sheep id = "<<mySheep.id()<<std::endl;
+    std::cout<<"your sheep id = "<<yourSheep.id()<<std::endl;
+    std::cout<<"a wolf id = "<<aWolf.id()<<std::endl;
+    
+    std::cout<<"Game Over\n";
+    return 0;
+}
+
