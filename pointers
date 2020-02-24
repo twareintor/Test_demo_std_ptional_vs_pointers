@@ -1,0 +1,73 @@
+// pointers
+
+#include <iostream>
+#include <vector>
+//#include <functional>
+
+class CAnimal
+{
+protected:
+    int m_id;
+public:
+    int& id(){return m_id;}
+    virtual bool canEat(const CAnimal*) const = 0;
+};
+
+bool CAnimal::canEat(const CAnimal* other) const{return (other!=this);}
+
+class CSheep: public CAnimal
+{
+public:
+    virtual bool canEat(const CAnimal*) const override{return false;}
+};
+
+class CWolf: public CAnimal
+{
+public:
+    virtual bool canEat(const CAnimal* other) const override{return dynamic_cast<const CSheep*>(other) && CAnimal::canEat(other);}
+};
+
+class CShelter
+{
+    std::vector<CAnimal*> m_animals;
+public:
+    void addAnimal(CAnimal* ani){if(ani){if(!m_animals.empty()) if(ani->canEat(m_animals.back()) || m_animals.back()->canEat(ani)) return; m_animals.push_back(ani);}}
+    void clear(){m_animals.clear();}
+    const std::vector<CAnimal*>* getAnimals() const{return &m_animals;}
+    int getAnimalCount(){return m_animals.size();}
+};
+
+int main()
+{
+    CSheep mySheep;
+    CSheep yourSheep;
+    CWolf aWolf;
+    
+    CShelter shelter;
+    
+    shelter.addAnimal(&mySheep);
+    shelter.addAnimal(&yourSheep);
+    shelter.addAnimal(&aWolf);
+    std::cout<<shelter.getAnimalCount()<<" animal(s) in shelter\n";
+
+    int i = 0;
+    for(const auto it: *shelter.getAnimals()){it->id() = ++i;}
+    std::cout<<"my sheep id = "<<mySheep.id()<<std::endl;
+    std::cout<<"your sheep id = "<<yourSheep.id()<<std::endl;
+    std::cout<<"a wolf id = "<<aWolf.id()<<std::endl;
+
+    shelter.clear();
+    shelter.addAnimal(&aWolf);
+    shelter.addAnimal(&yourSheep);
+    shelter.addAnimal(&mySheep);
+    std::cout<<shelter.getAnimalCount()<<" animal(s) in shelter\n";
+
+    for(const auto it: *shelter.getAnimals()){it->id() = ++i;}
+    std::cout<<"my sheep id = "<<mySheep.id()<<std::endl;
+    std::cout<<"your sheep id = "<<yourSheep.id()<<std::endl;
+    std::cout<<"a wolf id = "<<aWolf.id()<<std::endl;
+    
+    std::cout<<"Game Over\n";
+    return 0;
+}
+
