@@ -67,6 +67,14 @@ int main()
     std::cout<<"your sheep id = "<<yourSheep.id()<<std::endl;
     std::cout<<"a wolf id = "<<aWolf.id()<<std::endl;
     
+    CAnimal* pWolf = new CWolf();
+    std::cout<<(void*)&(*pWolf)<<std::endl;
+    std::optional<std::reference_wrapper<CAnimal>> opt;
+    if(pWolf) opt = *pWolf; else opt = std::nullopt;
+    shelter.addAnimal(opt);
+    std::cout<<shelter.getAnimalCount()<<" animal(s) in shelter\n";
+    delete pWolf;
+    
     std::cout<<"Game Over\n";
     return 0;
 }
