@@ -2,8 +2,12 @@
 two pieces of code demonstrating some use of std::optional of std::reference_wrapper vs the same functionality achieved traditionally through using pointers, combined with standard library containers
 
 
+
+Actually, everything derived from the class is a wolf and a sheep, representing carnivores and herbivores. 
+The basic idea (which construction is in another project of me) is like this:
+
 Class CAnimal: abstract class: 
-an animal can or cannot eat another animal and can or cannot be eaten from another
+An animal can or cannot eat another animal and can or cannot be eaten from another
 Herbivore cannot eat another animal
 Carnivores can eat only herbivores
 Ferocious can eat both herbivores and carnivores, except animal of its species
